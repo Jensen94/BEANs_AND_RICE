@@ -15,10 +15,10 @@ from Robinhood1 import Robinhood1
 class Interface:
 
 	#Assigning Crypto Currencies we will be researching
-	Cryptos =  ["ETHUSD","LTCUSD","BCHUSD","QTUMUSD","BTGUSD","NEOUSD"]
+	Cryptos =  ["ETHUSD","LTCUSD","BCHUSD","BTCUSD","DOGE"]
 	id = ["76637d50-c702-4ed1-bcb5-5b0732a81f48/","383280b1-ff53-43fc-9c84-f01afd0989cd/","2f2b77c4-e426-4271-ae49-18d5cb296d3a/",
-		  "7837d558-0fe9-4287-8f3e-6de592db127c/","a31d3fe3-38e6-4adf-ab4b-e303349f5ee4/","b9729798-2aec-4ca9-8637-4d9789d63764/"]
-	Cryptos_name = ["Ethereum", "Litecoin", "Bitcoin Cash", "Qtum", "Bitcoin Gold", "NEO"]
+		  "3d961844-d360-45fc-989b-f6fca761d511/","1ef78e1b-049b-4f12-90e5-555dcf2fe204/"]
+	Cryptos_name = ["Ethereum", "Litecoin", "Bitcoin Cash","Bitcoin","Dogecoin",]
 	Crypto_length = len(Cryptos)
 	Cryptos_price = ["None"] * Crypto_length
 	hours = 1
@@ -33,15 +33,12 @@ class Interface:
 		username = raw_input("Please enter Robinhood username: ")
 		password = raw_input("Please enter Robinhood password: ")
 		self.login_instance = Robinhood1(username,password)
-		bid_price = self.crypto_price(1)
-		#print self.login_instance.investment_profile()
-		#self.xls_write()
+		self.xls_write()
 
 	#Fetch crypto prices of irest
 	def crypto_price(self, counter):
 		self.Cryptos_price[counter] = self.login_instance.quote_data(self.Cryptos[counter],self.id[counter])
 		Cryptos_price_data = self.Cryptos_price[counter]
-		print Cryptos_price_data['bid_price']
 		return Cryptos_price_data['bid_price']
 
 	def xls_write(self):
@@ -63,6 +60,7 @@ class Interface:
 			self.counter = 0
 			while self.counter < self.Crypto_length :
 				price = self.crypto_price(self.counter)
+				print self.Cryptos[self.counter]+str(price)
 				self.sheet[self.counter].write(self.timeclock, 0, self.timeclock)
 				self.sheet[self.counter].write(self.timeclock, 1, price)
 				if (price > self.transprice[self.counter]) :
