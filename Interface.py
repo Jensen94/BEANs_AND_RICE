@@ -3,37 +3,91 @@
 
 import json
 import sys
-from Robinhood import Robinhood
+import gspread
+import xlwt
+import time
+import oauth2client.service_account
+#import ServiceAccountCredentials
+from Robinhood1 import Robinhood1
 
 #Interface class calls upon Robinhood to log in and initalize session while pulling cryptos of interest to buy and
 #sell.
 class Interface:
 
 	#Assigning Crypto Currencies we will be researching
-	Cryptos =  ["ETH","LTC","BCH","QTUM","BTG","NEO"]
+	Cryptos =  ["ETHUSD","LTCUSD","BCHUSD","QTUMUSD","BTGUSD","NEOUSD"]
+	id = ["76637d50-c702-4ed1-bcb5-5b0732a81f48/","383280b1-ff53-43fc-9c84-f01afd0989cd/","2f2b77c4-e426-4271-ae49-18d5cb296d3a/",
+		  "7837d558-0fe9-4287-8f3e-6de592db127c/","a31d3fe3-38e6-4adf-ab4b-e303349f5ee4/","b9729798-2aec-4ca9-8637-4d9789d63764/"]
 	Cryptos_name = ["Ethereum", "Litecoin", "Bitcoin Cash", "Qtum", "Bitcoin Gold", "NEO"]
 	Crypto_length = len(Cryptos)
 	Cryptos_price = ["None"] * Crypto_length
-	Crypto_DataFetch = [0] * Crypto_length
+	hours = 1
+	hr = 25
+	sheet = [None] *Crypto_length
+	transprice = [0] * Crypto_length
+	timeclock = 0
+	counter = 0
 
 	#Logging into Robinhood
 	def __init__(self):
 		username = raw_input("Please enter Robinhood username: ")
 		password = raw_input("Please enter Robinhood password: ")
-		self.login_instance = Robinhood(username,password)
-		self.crypto_price()
+		self.login_instance = Robinhood1(username,password)
+		bid_price = self.crypto_price(1)
+		#print self.login_instance.investment_profile()
+		#self.xls_write()
 
 	#Fetch crypto prices of irest
-	def crypto_price(self):
-		counter = 0
-		while counter < self.Crypto_length :
-			#Crypto_DataFetch[counter] = login_instance.instruments(Cryptos[counter])
-			#print Crypto_DataFetch[counter]
-			self.Cryptos_price[counter] = self.login_instance.quote_data(self.Cryptos[counter])
-			Cryptos_price_data = self.Cryptos_price[counter]
-			print self.Cryptos_name[counter] +" "+ Cryptos_price_data[0]['bid_price']
-			counter += 1
-			#Crypto_DataFetch[counter] = json.loads(Cryptos_price[counter].text)
-			#export1 = json.dumps(Crypto_DataFetch[counter], sort_keys=True, indent=4)
-			#json.loads(requester1.text)
-			#export1 = json.dumps(data1, sort_keys=True, indent=4)
+	def crypto_price(self, counter):
+		self.Cryptos_price[counter] = self.login_instance.quote_data(self.Cryptos[counter],self.id[counter])
+		Cryptos_price_data = self.Cryptos_price[counter]
+		print Cryptos_price_data['bid_price']
+		return Cryptos_price_data['bid_price']
+
+	def xls_write(self):
+		#Headers for XLS Sheets
+		self.counter = 0
+		while self.counter < self.Crypto_length :
+			book = xlwt.Workbook(encoding="utf-8")
+			self.sheet[self.counter] = book.add_sheet(self.Cryptos[self.counter])
+			self.sheet[self.counter].write(0,0,"Second")
+			self.sheet[self.counter].write(0,1,"Price")
+			self.sheet[self.counter].write(0,2,"Execution")
+			self.counter += 1
+		open
+		#Print Cyrpto Information in Initialized document
+		self.counter = 0
+		while self.timeclock < self.hr * self.hours :
+			self.timeclock += 1
+			print self.timeclock
+			self.counter = 0
+			while self.counter < self.Crypto_length :
+				price = self.crypto_price(self.counter)
+				self.sheet[self.counter].write(self.timeclock, 0, self.timeclock)
+				self.sheet[self.counter].write(self.timeclock, 1, price)
+				if (price > self.transprice[self.counter]) :
+					self.sheet[self.counter].write(self.timeclock, 2, "BUY")
+				elif (price < self.transprice[self.counter]) :
+					self.sheet[self.counter].write(self.timeclock, 2, "SELL")
+				else :
+					self.sheet[self.counter].write(self.timeclock, 2, "HOLD")
+				self.transprice[self.counter] = price
+				self.counter += 1
+		book.save('Track.xls')
+
+	# def xls_xport(self):
+		#Opening Google Sheets
+		# self.scope = ['https://spreadsheets.google.com/feeds']
+		# self.creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+		# self.client = gspread.authorize(creds)
+
+		#push data from track.py to google spreadsheet for analysis
+		# self.sheet = client.open("CryptoAnalysis").sheet1
+		# new_row = sheet.row)count +1
+		# sheet.update_cell(new_row,1,track.tradeticker)
+		# sheet.update_cell(new_row,2,track.price)
+		# sheet.update_cell(new_row,3,track.timeclock)
+		
+		
+
+		
