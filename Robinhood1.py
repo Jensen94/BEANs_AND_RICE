@@ -1,5 +1,6 @@
 import requests
 import urllib
+import json
 
 class Robinhood1:
 
@@ -77,7 +78,9 @@ class Robinhood1:
 		return account_number
 
 	def investment_profile(self):
-		self.session.get(self.endpoints['investment_profile'])
+		res = self.session.get(self.endpoints['investment_profile'])
+		res = json.loads(res.text)
+		return json.dumps(res, sort_keys=True, indent=4)
 
 	def instruments(self, stock):
 		res = self.session.get(self.endpoints['instruments'], params={'query':stock.upper()})

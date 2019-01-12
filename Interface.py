@@ -33,7 +33,8 @@ class Interface:
 		username = raw_input("Please enter Robinhood username: ")
 		password = raw_input("Please enter Robinhood password: ")
 		self.login_instance = Robinhood1(username,password)
-		self.xls_write()
+		print self.login_instance.investment_profile()
+		#self.xls_write()
 
 	#Fetch crypto prices of irest
 	def crypto_price(self, counter):
@@ -51,7 +52,6 @@ class Interface:
 			self.sheet[self.counter].write(0,1,"Price")
 			self.sheet[self.counter].write(0,2,"Execution")
 			self.counter += 1
-		open
 		#Print Cyrpto Information in Initialized document
 		self.counter = 0
 		while self.timeclock < self.hr * self.hours :
